@@ -1,4 +1,4 @@
-FROM redis:3
+FROM redis:alpine
 
 MAINTAINER Philippe VINCENT-ROYOL <vincent.royol@gmail.com>
 

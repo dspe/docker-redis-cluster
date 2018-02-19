@@ -31,7 +31,7 @@ services:
 
     # Redis master
     master:
-        image: redis:3
+        image: redis:alpine
         networks:
             - cluster
         depends_on:
@@ -39,14 +39,14 @@ services:
 
     # Redis slave
     slave:
-        image: redis:3
+        image: redis:alpine
         command: redis-server --slaveof redis-master 6379
         links:
             - master:redis-master
         networks:
             - cluster
         depends_on:
-            - registrator   
+            - registrator
 
     # Redis Sentinel
     sentinel:
