@@ -1,0 +1,79 @@
+version: "3"
+
+networks:
+    cluster: {}
+
+services:
+
+    # Service Registry
+    consul:
+        image: gliderlabs/consul-server:latest
+        command: "-advertise=127.0.0.1 -server -bootstrap"
+        container_name: consul
+        hostname: 127.0.0.1
+        ports:
+            - 8500:8500
+        networks:
+            - cluster
+
+    # Registrator:
+    registrator:
+        image: gliderlabs/registrator:latest
+        command: "-internal consul://consul:8500"
+        container_name: registrator
+        hostname: 127.0.0.1
+        depends_on:
+            - consul
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock
+        networks:
+            - cluster
+
+    # Redis master
+    master:
+        image: redis:3
+        networks:
+            - cluster
+        depends_on:
+            - registrator
+
+    # Redis slave
+    slave:
+        image: redis:3
+        command: redis-server --slaveof redis-master 6379
+        links:
+            - master:redis-master
+        networks:
+            - cluster
+        depends_on:
+            - registrator   
+
+    # Redis Sentinel
+    sentinel:
+        build: sentinel
+        environment:
+            - SENTINEL_DOWN_AFTER=5000
+            - SENTINEL_FAILOVER=5000
+        links:
+            - master:redis-master
+            - slave
+        networks:
+            - cluster
+        depends_on:
+            - registrator
+
+    # HaProxy
+    haproxy:
+        build: haproxy
+        depends_on:
+            - master
+            - slave
+            - sentinel
+            - registrator
+        networks:
+            - cluster
+        links:
+            - consul
+        ports:
+            - 9000:9000
+            - 6379:6379
