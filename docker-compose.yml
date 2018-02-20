@@ -65,7 +65,10 @@ services:
 
     # HaProxy
     haproxy:
+        container_name: haproxy-redis
         build: haproxy
+        environment:
+            - SERVICE_NAME=haproxy-redis
         depends_on:
             - master
             - slave
