@@ -1,18 +1,97 @@
 global
     log 127.0.0.1   local0
     log 127.0.0.1   local1 notice
-    debug
-#    stats timeout 30s
+    #Adds a global syslog server. Up to two global servers can be defined. They
+    #will receive logs for startups and exits, as well as all logs from proxies
+    #configured with "log global". An optional level can be specified to filter 
+    #outgoing messages. By default, all messages are sent.
+
+    #An IPv4 address optionally followed by a colon and a UDP port. If
+    #no port is specified, 514 is used by default (the standard syslog port).
+
     maxconn 4096
+    #Sets the maximum per-process number of concurrent connections to <number>. It
+    #is equivalent to the command-line argument "-n". Proxies will stop accepting
+    #connections when this limit is reached. The "ulimit-n" parameter is
+    #automatically adjusted according to this value. See also "ulimit-n"
+
+    #uid 99
+    #Changes the process' user ID to <number>. It is recommended that the user ID
+    #is dedicated to HAProxy or to a small set of similar daemons. HAProxy must
+    #be started with superuser privileges in order to be able to switch to another
+    #one. See also "gid" and "user".
+
+    #gid 99
+    #Changes the process' group ID to <number>. It is recommended that the group
+    #ID is dedicated to HAProxy or to a small set of similar daemons. HAProxy must
+    #be started with a user belonging to this group, or with superuser privileges.
+    #See also "group" and "uid".
+
+    daemon
+    #Makes the process fork into background. This is the recommended mode of
+    #operation. It is equivalent to the command line "-D" argument. It can be
+    #disabled by the command line "-db" argument.
+
+    #debug
+    #Enables debug mode which dumps to stdout all exchanges, and disables forking
+    #into background. It is the equivalent of the command-line argument "-d". It
+    #should never be used in a production configuration since it may prevent full
+    #system startup.
+
+    #quiet
+    #Do not display any message during startup. It is equivalent to the command-
+    #line argument "-q".
 
 defaults
     log global
-    option httplog
-    option dontlognull
+    #Enable per-instance logging of events and traffic.
+    #global should be used when the instance's logging parameters are the
+    #same as the global ones. This is the most common usage. "global"
+    #replaces <address>, <facility> and <level> with those of the log
+    #entries found in the "global" section. Only one "log global"
+    #statement may be used per instance, and this form takes no other
+    #parameter.
+
     mode http
+    #Set the running mode or protocol of the instance
+    #The instance will work in HTTP mode. The client request will be
+    #analyzed in depth before connecting to any server. Any request
+    #which is not RFC-compliant will be rejected. Layer 7 filtering,
+    #processing and switching will be possible. This is the mode which
+    #brings HAProxy most of its value.
+
+    option httplog
+    #Enable logging of HTTP request, session state and timers
+
+    option dontlognull
+    #Enable or disable logging of null connections
+
+    retries	3
+    #Set the number of retries to perform on a server after a connection failure
+
+    option redispatch
+    #Enable or disable session redistribution in case of connection failure
+
+    maxconn	2000
+    #Fix the maximum number of concurrent connections on a frontend
+    #This value should not exceed the global maxconn
+
     timeout connect     5000
+    #Set the maximum time to wait for a connection attempt to a server to succeed.
+
     timeout client     50000
+    #Set the maximum inactivity time on the client side.
+    #An unspecified timeout results in an infinite timeout, which
+    #is not recommended. Such a usage is accepted and works but reports a warning
+    #during startup because it may results in accumulation of expired sessions in
+    #the system if the system's timeouts are not configured either.
+
     timeout server     50000
+    #Set the maximum inactivity time on the server side.
+
+    #balance roundrobin
+    #The load balancing algorithm of a backend is set to roundrobin when no other
+    #algorithm, mode nor option have been set
 
 listen stats 
     bind 0.0.0.0:9000
