@@ -1,5 +1,7 @@
 # Redis Cluster configuration with HaProxy
 
+Slides regarding this topic: https://docs.google.com/presentation/d/12KBX74pPPmcqfBQnOACOeCOhBpKe8au5kYnlvFPJBSc/edit?usp=sharing
+
 An example configuration for running a [Redis cluster](https://redis.io/topics/cluster-tutorial) behind a load balancer [HaProxy](http://www.haproxy.org/). 
 
 HaProxy configuration is auto update via a service discovery tool: [Consul](https://www.consul.io/). All containers are automaticaly registered to Consul via the registrator. Please read the official documentation to learn more about it.
