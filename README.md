@@ -1,6 +1,6 @@
 # Redis Cluster configuration with HaProxy
 
-Slides regarding this topic: https://docs.google.com/presentation/d/12KBX74pPPmcqfBQnOACOeCOhBpKe8au5kYnlvFPJBSc/edit?usp=sharing
+Slides regarding this topic: https://docs.google.com/presentation/d/1J6-AUjDdqMJqZs9b2ahdidwMpTYHzkqBqu7roMjdyFs/edit?usp=sharing 
 
 An example configuration for running a [Redis cluster](https://redis.io/topics/cluster-tutorial) behind a load balancer [HaProxy](http://www.haproxy.org/). 
 
@@ -37,5 +37,16 @@ $ chmod +x test.sh
 $ sh test.sh
 ```
 
+## Check Current master
+
+```
+$ docker-compose exec sentinel redis-cli -p 26379 SENTINEL get-master-addr-by-name mymaster
+``` 
+
+## Access to Redis Cli
+
+```
+$ docker-compose exec master redis-cli memory stats
+```
 
 No warranty or support. Use as you wish.
